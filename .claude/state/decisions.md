@@ -125,6 +125,24 @@
 
 ---
 
+## DEC-007: Paquetes JWT en Infrastructure Layer
+
+**Fecha**: 2025-12-23
+**Estado**: Aceptada
+**Contexto**: TokenService.cs usa clases de JWT pero los paquetes solo estaban en Api project.
+
+**Decisión**: Agregar paquetes JWT directamente a Infrastructure.csproj donde se usa TokenService.
+
+**Consecuencias**:
+- ✅ Build de Docker exitoso
+- ✅ Clean Architecture respetada (Infrastructure puede usar JWT)
+- ⚠️ Versiones alineadas: Microsoft.IdentityModel.Tokens 8.3.1, System.IdentityModel.Tokens.Jwt 8.3.1
+
+**Archivos afectados**:
+- `src/backend/src/CobranzaCloud.Infrastructure/CobranzaCloud.Infrastructure.csproj`
+
+---
+
 ## [Plantilla para nuevas decisiones]
 
 <!--
