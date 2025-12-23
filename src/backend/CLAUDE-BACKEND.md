@@ -13,9 +13,9 @@ Este es el backend de **CobranzaCloud**, una plataforma SaaS de gestión de cobr
 ### Stack Tecnológico
 | Componente | Tecnología | Versión |
 |------------|------------|---------|
-| Framework | .NET | 8.0 LTS |
+| Framework | .NET | 9.0 |
 | API Style | Minimal API | - |
-| ORM | Entity Framework Core | 8.x |
+| ORM | Entity Framework Core | 9.x |
 | Database | PostgreSQL | 16 |
 | Cache | Redis | 7.x |
 | Auth | JWT + Clerk Integration | - |
