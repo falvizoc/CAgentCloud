@@ -27,9 +27,10 @@ ENV ASPNETCORE_URLS=http://+:5000
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 
-# Install EF Core tools for migrations
-RUN dotnet tool install --global dotnet-ef
-ENV PATH="$PATH:/root/.dotnet/tools"
+# Install EF Core tools for migrations (with retry for transient failures)
+RUN dotnet tool install --global dotnet-ef --version 9.0.0 || \
+    dotnet tool install --global dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
 
 # Entry point for development with hot reload
 ENTRYPOINT ["dotnet", "watch", "run", "--project", "src/CobranzaCloud.Api/CobranzaCloud.Api.csproj", "--urls", "http://+:5000"]

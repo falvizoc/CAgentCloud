@@ -55,4 +55,5 @@ docker-compose.override.yml
 secrets/
 
 # Claude Code
-.claude/
+.claude/sessions/CURRENT.md
+.claude/plans/

@@ -1,6 +1,11 @@
+using System.Text;
+using CobranzaCloud.Application.Auth;
 using CobranzaCloud.Infrastructure.Data;
+using CobranzaCloud.Infrastructure.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CobranzaCloud.Api.Extensions;
 
@@ -14,6 +19,9 @@ public static class ServiceCollectionExtensions
         // Database
         services.AddDatabase(configuration);
 
+        // Authentication
+        services.AddJwtAuthentication(configuration);
+
         // MediatR
         services.AddMediatR(cfg =>
         {
@@ -26,6 +34,71 @@ public static class ServiceCollectionExtensions
         // Health Checks
         services.AddHealthChecks()
             .AddNpgSql(configuration.GetConnectionString("DefaultConnection") ?? "");
+
+        return services;
+    }
+
+    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Bind JWT settings
+        var jwtSettings = configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
+            ?? throw new InvalidOperationException("JWT settings not configured");
+
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddScoped<ITokenService, TokenService>();
+
+        // Configure JWT authentication
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                ClockSkew = TimeSpan.Zero // No tolerance for expired tokens
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    if (context.Exception is SecurityTokenExpiredException)
+                    {
+                        context.Response.Headers.Append("Token-Expired", "true");
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        });
+
+        // Authorization policies
+        services.AddAuthorizationBuilder()
+            .AddPolicy("CarteraRead", policy =>
+                policy.RequireAssertion(ctx =>
+                    ctx.User.HasClaim("permissions", "cartera:read") ||
+                    ctx.User.HasClaim("permissions", "cartera:*") ||
+                    ctx.User.IsInRole("admin") ||
+                    ctx.User.IsInRole("owner")))
+            .AddPolicy("CarteraWrite", policy =>
+                policy.RequireAssertion(ctx =>
+                    ctx.User.HasClaim("permissions", "cartera:write") ||
+                    ctx.User.HasClaim("permissions", "cartera:*") ||
+                    ctx.User.IsInRole("admin") ||
+                    ctx.User.IsInRole("owner")))
+            .AddPolicy("UsersManage", policy =>
+                policy.RequireAssertion(ctx =>
+                    ctx.User.HasClaim("permissions", "users:*") ||
+                    ctx.User.IsInRole("admin") ||
+                    ctx.User.IsInRole("owner")));
 
         return services;
     }

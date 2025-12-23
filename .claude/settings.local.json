@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(git init:*)",
+      "Bash(gh auth:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nchore: initial project setup with documentation\n\n- Add CLAUDE.md with project vision, architecture, and guidelines\n- Add comprehensive docs/ with 14 documentation files covering:\n  - Architecture, stack, security \\(OWASP 2025\\)\n  - UX guidelines, API spec, deployment\n  - Sync protocol, FRICTIONLESS manifest\n  - Features roadmap and marketing specs\n- Add agent context files \\(CLAUDE-BACKEND, CLAUDE-FRONTEND, CLAUDE-DEVOPS\\)\n- Add TypeScript API contracts\n- Add CHANGELOG and CONTRIBUTING guides\n- Add .gitignore for .NET, Node.js, and IDE files\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(where gh:*)",
+      "Bash(ssh:*)",
+      "Bash(git commit:*)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet sln add:*)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet build:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(del \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\\\\src\\\\frontend\\\\next.config.ts\")"
+    ]
+  }
+}

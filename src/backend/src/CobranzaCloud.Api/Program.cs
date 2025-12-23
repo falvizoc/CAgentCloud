@@ -45,6 +45,10 @@ try
     // CORS
     app.UseCors("AllowFrontend");
 
+    // Authentication & Authorization
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     if (app.Environment.IsDevelopment())
     {
         app.MapOpenApi();

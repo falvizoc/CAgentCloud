@@ -12,8 +12,10 @@ public static class EndpointRouteBuilderExtensions
         // System endpoints (health, info)
         app.MapSystemEndpoints();
 
+        // Auth endpoints (M1)
+        app.MapAuthEndpoints();
+
         // Future endpoints will be added here:
-        // app.MapAuthEndpoints();
         // app.MapCarteraEndpoints();
         // app.MapClientesEndpoints();
         // app.MapCobranzaEndpoints();
