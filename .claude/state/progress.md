@@ -41,7 +41,7 @@
 
 ## M1: Core Auth - EN PROGRESO 🔄
 
-### Backend (90% completado)
+### Backend (100% completado)
 - [x] Entidades de dominio (User, Organization, RefreshToken)
 - [x] Entidades de negocio (Cliente, Factura, Contacto, Connector)
 - [x] Servicio JWT (TokenService)
@@ -54,7 +54,7 @@
 - [x] Configuraciones EF Core
 - [x] Middleware de autenticación JWT
 - [x] Políticas de autorización
-- [ ] Migración inicial (pendiente validación)
+- [x] Migración inicial (InitialCreate aplicada)
 
 ### Frontend (0% completado)
 - [ ] Página de login

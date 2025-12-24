@@ -136,7 +136,7 @@
 **Consecuencias**:
 - ✅ Build de Docker exitoso
 - ✅ Clean Architecture respetada (Infrastructure puede usar JWT)
-- ⚠️ Versiones alineadas: Microsoft.IdentityModel.Tokens 8.3.1, System.IdentityModel.Tokens.Jwt 8.3.1
+- ⚠️ Versiones alineadas: Microsoft.IdentityModel.Tokens 8.14.0, System.IdentityModel.Tokens.Jwt 8.14.0
 
 **Archivos afectados**:
 - `src/backend/src/CobranzaCloud.Infrastructure/CobranzaCloud.Infrastructure.csproj`
