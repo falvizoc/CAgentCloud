@@ -2,7 +2,9 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'sonner';
 import { useState, type ReactNode } from 'react';
+import { AuthProvider } from '@/components/auth';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -11,6 +13,8 @@ interface ProvidersProps {
 /**
  * Application providers wrapper
  * Includes TanStack Query for server state management
+ * AuthProvider for authentication state and token refresh
+ * Sonner Toaster for notifications
  */
 export function Providers({ children }: ProvidersProps) {
   const [queryClient] = useState(
@@ -28,7 +32,10 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <AuthProvider>
+        {children}
+        <Toaster richColors position="top-right" />
+      </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

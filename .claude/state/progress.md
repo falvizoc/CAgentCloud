@@ -12,7 +12,7 @@
 | Milestone | Nombre | Estado | Fecha |
 |-----------|--------|--------|-------|
 | M0 | Foundation | ✅ Completado | 2025-12-23 |
-| M1 | Core Auth | 🔄 En progreso | 2025-12-23 |
+| M1 | Core Auth | ✅ Completado | 2025-12-23 |
 | M2 | Sync Infrastructure | ⏳ Pendiente | - |
 | M3 | Dashboard MVP | ⏳ Pendiente | - |
 | M4 | Cobranza Básica | ⏳ Pendiente | - |
@@ -39,7 +39,7 @@
 
 ---
 
-## M1: Core Auth - EN PROGRESO 🔄
+## M1: Core Auth - COMPLETADO ✅
 
 ### Backend (100% completado)
 - [x] Entidades de dominio (User, Organization, RefreshToken)
@@ -56,12 +56,15 @@
 - [x] Políticas de autorización
 - [x] Migración inicial (InitialCreate aplicada)
 
-### Frontend (0% completado)
-- [ ] Página de login
-- [ ] Página de registro
-- [ ] AuthContext/Provider
-- [ ] Protección de rutas
-- [ ] Manejo de tokens
+### Frontend (100% completado)
+- [x] Componentes UI base (shadcn/ui: button, input, label, card)
+- [x] Página de login (/login)
+- [x] Página de registro (/register)
+- [x] Auth Store (Zustand con persistencia)
+- [x] Auth Hooks (TanStack Query mutations)
+- [x] AuthProvider (auto-refresh tokens)
+- [x] ProtectedRoute (redirección automática)
+- [x] Integración token en API client
 
 ### OAuth (Opcional MVP)
 - [ ] OAuth Google
