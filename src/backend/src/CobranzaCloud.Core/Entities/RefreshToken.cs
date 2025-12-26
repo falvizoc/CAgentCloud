@@ -15,9 +15,12 @@ public class RefreshToken
     public string? ReplacedByToken { get; set; }
     public string? ReasonRevoked { get; set; }
 
-    // Navigation
-    public Guid UserId { get; set; }
-    public User User { get; set; } = null!;
+    // Navigation - Either User or Connector owns the token
+    public Guid? UserId { get; set; }
+    public User? User { get; set; }
+
+    public Guid? ConnectorId { get; set; }
+    public Connector? Connector { get; set; }
 
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
     public bool IsRevoked => RevokedAt != null;

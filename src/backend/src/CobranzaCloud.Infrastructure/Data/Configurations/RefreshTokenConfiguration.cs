@@ -31,10 +31,17 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         // Index for token lookup
         builder.HasIndex(t => t.Token);
 
-        // Relationship
+        // Relationships - token belongs to either User or Connector
         builder.HasOne(t => t.User)
             .WithMany(u => u.RefreshTokens)
             .HasForeignKey(t => t.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
+
+        builder.HasOne(t => t.Connector)
+            .WithMany()
+            .HasForeignKey(t => t.ConnectorId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
     }
 }

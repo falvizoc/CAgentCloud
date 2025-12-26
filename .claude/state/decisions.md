@@ -143,6 +143,33 @@
 
 ---
 
+## DEC-008: Sistema Link Code para Conectores (M2)
+
+**Fecha**: 2025-12-26
+**Estado**: Aceptada
+**Contexto**: Los conectores locales necesitan vincularse de forma segura sin exponer credenciales.
+
+**Decisión**: Implementar sistema de códigos de 6 caracteres alfanuméricos con las siguientes características:
+- Código expira en 15 minutos
+- Un solo uso
+- Valida machine fingerprint entre generación y registro
+- Tokens JWT especiales para conectores con claims `type: connector`
+
+**Consecuencias**:
+- ✅ FRICTIONLESS: Usuario solo escribe código de 6 dígitos en conector
+- ✅ Seguro: No expone credenciales, tokens separados de usuarios
+- ✅ Multi-tenant: OrganizationId vinculado automáticamente
+- ⚠️ RefreshToken ahora soporta UserId OR ConnectorId (nullable)
+
+**Archivos afectados**:
+- `src/backend/src/CobranzaCloud.Core/Entities/LinkCode.cs` (nuevo)
+- `src/backend/src/CobranzaCloud.Core/Entities/RefreshToken.cs` (modificado)
+- `src/backend/src/CobranzaCloud.Infrastructure/Services/ConnectorService.cs` (nuevo)
+- `src/backend/src/CobranzaCloud.Api/Endpoints/ConnectorsEndpoints.cs` (nuevo)
+- `src/backend/src/CobranzaCloud.Api/Endpoints/SyncEndpoints.cs` (nuevo)
+
+---
+
 ## [Plantilla para nuevas decisiones]
 
 <!--

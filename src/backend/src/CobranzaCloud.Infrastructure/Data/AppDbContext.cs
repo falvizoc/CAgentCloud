@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
 
     // Business entities
     public DbSet<Connector> Connectors => Set<Connector>();
+    public DbSet<LinkCode> LinkCodes => Set<LinkCode>();
     public DbSet<Cliente> Clientes => Set<Cliente>();
     public DbSet<Factura> Facturas => Set<Factura>();
     public DbSet<Contacto> Contactos => Set<Contacto>();

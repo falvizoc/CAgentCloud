@@ -18,7 +18,23 @@
       "Bash(docker-compose up:*)",
       "Bash(docker:*)",
       "Bash(docker-compose:*)",
-      "Bash(del \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\\\\src\\\\frontend\\\\next.config.ts\")"
+      "Bash(del \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\\\\src\\\\frontend\\\\next.config.ts\")",
+      "Bash(git -C \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\" status)",
+      "Bash(git -C \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\" log -1 --oneline)",
+      "Bash(git -C \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\" diff src/backend/src/CobranzaCloud.Infrastructure/CobranzaCloud.Infrastructure.csproj)",
+      "Bash(git -C \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\" add src/backend/src/CobranzaCloud.Infrastructure/CobranzaCloud.Infrastructure.csproj .claude/state/decisions.md)",
+      "Bash(git -C \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\" commit -m \"$\\(cat <<''EOF''\nfix\\(M1\\): add JWT packages to Infrastructure layer\n\nTokenService.cs uses System.IdentityModel.Tokens.Jwt classes but the\npackages were only referenced in Api project, causing Docker build to fail.\n\nAdded packages:\n- Microsoft.IdentityModel.Tokens v8.3.1\n- System.IdentityModel.Tokens.Jwt v8.3.1\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(wslpath:*)",
+      "Bash(curl:*)",
+      "Bash(powershell.exe -Command \"docker compose -f ''c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\\\\docker\\\\docker-compose.yml'' exec frontend npm run build\")",
+      "Bash(dotnet ef migrations add:*)",
+      "Bash(dotnet tool install:*)",
+      "Bash(dotnet tool update:*)",
+      "Bash(dotnet tool list:*)",
+      "Bash(dotnet nuget:*)",
+      "Bash(powershell.exe -Command \"docker ps --format ''table {{.Names}}\\\\t{{.Status}}\\\\t{{.Ports}}''\")",
+      "Bash(/mnt/c/Program\\\\ Files/Docker/Docker/resources/bin/docker.exe ps:*)",
+      "Bash(where:*)"
     ]
   }
 }

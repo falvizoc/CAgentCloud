@@ -1,11 +1,11 @@
 # Estado del Proyecto
 
-> **Última actualización**: 2025-12-23
+> **Última actualización**: 2025-12-26
 > **Versión**: 0.1.0 (Pre-MVP)
 
 ---
 
-## Milestone Actual: M1 - Core Auth
+## Milestone Actual: M2 - Sync Infrastructure
 
 ### Roadmap General
 
@@ -13,7 +13,7 @@
 |-----------|--------|--------|-------|
 | M0 | Foundation | ✅ Completado | 2025-12-23 |
 | M1 | Core Auth | ✅ Completado | 2025-12-23 |
-| M2 | Sync Infrastructure | ⏳ Pendiente | - |
+| M2 | Sync Infrastructure | ✅ Completado | 2025-12-26 |
 | M3 | Dashboard MVP | ⏳ Pendiente | - |
 | M4 | Cobranza Básica | ⏳ Pendiente | - |
 
@@ -69,6 +69,37 @@
 ### OAuth (Opcional MVP)
 - [ ] OAuth Google
 - [ ] OAuth Microsoft 365
+
+---
+
+## M2: Sync Infrastructure - COMPLETADO ✅
+
+### Backend (100% completado)
+- [x] Entidad LinkCode (código de 6 dígitos)
+- [x] Configuración EF Core LinkCode
+- [x] DTOs Connectors (GenerateLinkCode, Register, Heartbeat)
+- [x] DTOs Sync (SyncCartera con Clientes, Facturas, Contactos)
+- [x] Interface IConnectorService
+- [x] Implementación ConnectorService
+  - [x] GenerateLinkCodeAsync
+  - [x] RegisterConnectorAsync
+  - [x] RecordHeartbeatAsync
+  - [x] GenerateConnectorAccessToken (JWT especial)
+  - [x] RefreshConnectorTokenAsync
+- [x] ConnectorsEndpoints
+  - [x] POST /api/connectors/link-code (requiere JWT usuario)
+  - [x] POST /api/connectors/register (público, usa código)
+  - [x] POST /api/connectors/heartbeat (requiere JWT conector)
+  - [x] POST /api/connectors/refresh
+- [x] SyncEndpoints
+  - [x] POST /api/sync/cartera (requiere JWT conector)
+- [x] Migración EF Core (AddLinkCodesAndConnectorRefreshTokens)
+- [x] RefreshToken modificado para soportar ConnectorId
+
+### Pendiente para integración completa
+- [ ] Aplicar migración en base de datos
+- [ ] Tests de integración
+- [ ] Probar con conector real
 
 ---
 

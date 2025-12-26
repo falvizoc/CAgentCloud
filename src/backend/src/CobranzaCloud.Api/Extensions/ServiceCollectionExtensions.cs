@@ -1,5 +1,6 @@
 using System.Text;
 using CobranzaCloud.Application.Auth;
+using CobranzaCloud.Application.Connectors;
 using CobranzaCloud.Infrastructure.Data;
 using CobranzaCloud.Infrastructure.Services;
 using FluentValidation;
@@ -46,6 +47,7 @@ public static class ServiceCollectionExtensions
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IConnectorService, ConnectorService>();
 
         // Configure JWT authentication
         services.AddAuthentication(options =>

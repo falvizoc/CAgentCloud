@@ -15,12 +15,14 @@ public static class EndpointRouteBuilderExtensions
         // Auth endpoints (M1)
         app.MapAuthEndpoints();
 
+        // Connector and Sync endpoints (M2)
+        app.MapConnectorsEndpoints();
+        app.MapSyncEndpoints();
+
         // Future endpoints will be added here:
         // app.MapCarteraEndpoints();
         // app.MapClientesEndpoints();
         // app.MapCobranzaEndpoints();
-        // app.MapConnectorsEndpoints();
-        // app.MapSyncEndpoints();
 
         return app;
     }
