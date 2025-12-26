@@ -585,3 +585,52 @@ export interface ApiClientConfig {
   onTokenRefresh?: (refreshToken: string) => Promise<string>;
   onUnauthorized?: () => void;
 }
+
+// ============================================================
+// CARTERA ENDPOINTS RESPONSES (M3)
+// ============================================================
+
+export interface CarteraResumenResponse {
+  totalCartera: Money;
+  carteraVigente: Money;
+  carteraVencida: Money;
+  porcentajeVencido: number;
+  clientesConSaldo: number;
+  facturasActivas: number;
+  ultimaSincronizacion?: ISODate;
+}
+
+export interface CarteraAntiguedadResponse {
+  rangos: RangoAntiguedadItem[];
+  total: Money;
+}
+
+export interface RangoAntiguedadItem {
+  rango: string;
+  label: string;
+  monto: Money;
+  facturas: number;
+  porcentaje: number;
+}
+
+export interface ClienteListItem {
+  id: UUID;
+  clave: string;
+  nombre: string;
+  saldoTotal: Money;
+  saldoVencido: Money;
+  diasMaxVencido: number;
+  facturasActivas: number;
+}
+
+export interface ClientesListResponse {
+  items: ClienteListItem[];
+  meta: ClientesPaginationMeta;
+}
+
+export interface ClientesPaginationMeta {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}

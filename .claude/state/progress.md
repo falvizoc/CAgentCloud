@@ -5,7 +5,7 @@
 
 ---
 
-## Milestone Actual: M2 - Sync Infrastructure
+## Milestone Actual: M3 - Dashboard MVP (En Progreso)
 
 ### Roadmap General
 
@@ -14,7 +14,7 @@
 | M0 | Foundation | ✅ Completado | 2025-12-23 |
 | M1 | Core Auth | ✅ Completado | 2025-12-23 |
 | M2 | Sync Infrastructure | ✅ Completado | 2025-12-26 |
-| M3 | Dashboard MVP | ⏳ Pendiente | - |
+| M3 | Dashboard MVP | 🔄 En Progreso | 2025-12-26 |
 | M4 | Cobranza Básica | ⏳ Pendiente | - |
 
 ---
@@ -97,15 +97,43 @@
 - [x] RefreshToken modificado para soportar ConnectorId
 
 ### Pendiente para integración completa
-- [ ] Aplicar migración en base de datos
+- [x] Aplicar migración en base de datos (2025-12-26)
 - [ ] Tests de integración
 - [ ] Probar con conector real
 
 ---
 
+## M3: Dashboard MVP - EN PROGRESO 🔄
+
+### Backend (100% completado)
+- [x] DTOs Cartera (CarteraResumenResponse, CarteraAntiguedadResponse, etc.)
+- [x] CarteraEndpoints
+  - [x] GET /api/cartera/resumen (requiere JWT + CarteraRead)
+  - [x] GET /api/cartera/antiguedad (requiere JWT + CarteraRead)
+- [x] ClientesEndpoints
+  - [x] GET /api/clientes (paginado, filtros, ordenamiento)
+- [x] Registro de endpoints en EndpointRouteBuilderExtensions
+
+### Frontend (100% completado)
+- [x] Componentes UI (table, skeleton)
+- [x] Layout del dashboard con navegación
+- [x] Página del dashboard
+- [x] Hooks de cartera (useCarteraResumen, useCarteraAntiguedad, useClientes)
+- [x] Componentes dashboard:
+  - [x] KpiCards (4 tarjetas de indicadores)
+  - [x] AntiguedadChart (gráfico de barras de antigüedad)
+  - [x] ClientesTable (tabla paginada de clientes)
+- [x] Tipos TypeScript actualizados en contracts/api-types.ts
+
+### Pendiente
+- [ ] Validar con Node.js 20+ (requerido por Next.js 14)
+- [ ] Prueba de flujo completo
+
+---
+
 ## Blockers Actuales
 
-Ninguno identificado.
+**Menor**: Node.js en el entorno local es v16.14.0, se requiere v20.9.0+ para Next.js 14.
 
 ---
 
@@ -113,9 +141,10 @@ Ninguno identificado.
 
 | Métrica | Valor |
 |---------|-------|
-| Sesiones totales | 2 |
+| Sesiones totales | 3 |
 | Commits | ~6 |
 | Archivos creados M1 | 20+ |
+| Archivos creados M3 | 12 |
 | Tests | 0 (pendiente) |
 
 ---

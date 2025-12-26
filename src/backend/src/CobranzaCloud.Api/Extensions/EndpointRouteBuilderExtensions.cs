@@ -19,9 +19,11 @@ public static class EndpointRouteBuilderExtensions
         app.MapConnectorsEndpoints();
         app.MapSyncEndpoints();
 
+        // Cartera and Clientes endpoints (M3)
+        app.MapCarteraEndpoints();
+        app.MapClientesEndpoints();
+
         // Future endpoints will be added here:
-        // app.MapCarteraEndpoints();
-        // app.MapClientesEndpoints();
         // app.MapCobranzaEndpoints();
 
         return app;
