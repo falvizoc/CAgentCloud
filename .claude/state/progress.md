@@ -5,7 +5,7 @@
 
 ---
 
-## Milestone Actual: M3 - Dashboard MVP (En Progreso)
+## Milestone Actual: M4 - Cobranza Basica (Proximo)
 
 ### Roadmap General
 
@@ -14,7 +14,7 @@
 | M0 | Foundation | ✅ Completado | 2025-12-23 |
 | M1 | Core Auth | ✅ Completado | 2025-12-23 |
 | M2 | Sync Infrastructure | ✅ Completado | 2025-12-26 |
-| M3 | Dashboard MVP | 🔄 En Progreso | 2025-12-26 |
+| M3 | Dashboard MVP | ✅ Completado | 2025-12-26 |
 | M4 | Cobranza Básica | ⏳ Pendiente | - |
 
 ---
@@ -103,30 +103,33 @@
 
 ---
 
-## M3: Dashboard MVP - EN PROGRESO 🔄
+## M3: Dashboard MVP - COMPLETADO ✅
 
 ### Backend (100% completado)
 - [x] DTOs Cartera (CarteraResumenResponse, CarteraAntiguedadResponse, etc.)
+- [x] DTOs Cliente detalle (ClienteDetailResponse, DireccionDto, ContactoDto, FacturaDto)
 - [x] CarteraEndpoints
   - [x] GET /api/cartera/resumen (requiere JWT + CarteraRead)
   - [x] GET /api/cartera/antiguedad (requiere JWT + CarteraRead)
 - [x] ClientesEndpoints
   - [x] GET /api/clientes (paginado, filtros, ordenamiento)
+  - [x] GET /api/clientes/{id} (detalle con contactos y facturas)
 - [x] Registro de endpoints en EndpointRouteBuilderExtensions
 
 ### Frontend (100% completado)
 - [x] Componentes UI (table, skeleton)
 - [x] Layout del dashboard con navegación
 - [x] Página del dashboard
-- [x] Hooks de cartera (useCarteraResumen, useCarteraAntiguedad, useClientes)
+- [x] Hooks de cartera (useCarteraResumen, useCarteraAntiguedad, useClientes, useClienteDetalle)
 - [x] Componentes dashboard:
   - [x] KpiCards (4 tarjetas de indicadores)
   - [x] AntiguedadChart (gráfico de barras de antigüedad)
-  - [x] ClientesTable (tabla paginada de clientes)
+  - [x] ClientesTable (tabla paginada con links a detalle)
+- [x] Página detalle cliente (/clientes/[id])
 - [x] Tipos TypeScript actualizados en contracts/api-types.ts
 
-### Pendiente
-- [ ] Validar con Node.js 20+ (requerido por Next.js 14)
+### Pendiente para validación
+- [ ] Rebuild contenedores Docker
 - [ ] Prueba de flujo completo
 
 ---
@@ -144,7 +147,7 @@
 | Sesiones totales | 3 |
 | Commits | ~6 |
 | Archivos creados M1 | 20+ |
-| Archivos creados M3 | 12 |
+| Archivos creados M3 | 15 |
 | Tests | 0 (pendiente) |
 
 ---

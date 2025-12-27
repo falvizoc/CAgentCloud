@@ -6,6 +6,7 @@ import type {
   CarteraResumenResponse,
   CarteraAntiguedadResponse,
   ClientesListResponse,
+  ClienteDetailResponse,
 } from '../api/types';
 
 // ============================================================
@@ -69,6 +70,21 @@ export function useClientes(params?: {
       const response = await apiClient.get<ClientesListResponse>(endpoint);
       return response.data;
     },
+    staleTime: 1 * 60 * 1000, // 1 minute
+  });
+}
+
+/**
+ * Hook to fetch cliente detail by ID
+ */
+export function useClienteDetalle(id: string | undefined) {
+  return useQuery({
+    queryKey: ['clientes', id],
+    queryFn: async () => {
+      const response = await apiClient.get<ClienteDetailResponse>(`/api/clientes/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 }

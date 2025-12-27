@@ -62,3 +62,64 @@ public record PaginationMeta(
     int Total,
     int TotalPages
 );
+
+// ============================================================
+// CLIENTE DETAIL DTOs
+// ============================================================
+
+/// <summary>
+/// Response for GET /api/clientes/{id}
+/// </summary>
+public record ClienteDetailResponse(
+    Guid Id,
+    string Clave,
+    string Nombre,
+    string? Rfc,
+    string? Email,
+    string? Telefono,
+    DireccionDto? Direccion,
+    decimal SaldoTotal,
+    decimal SaldoVencido,
+    int DiasMaxVencido,
+    int FacturasActivas,
+    DateTime? UltimoPago,
+    DateTime? LastSyncAt,
+    List<ContactoDto> Contactos,
+    List<FacturaDto> Facturas
+);
+
+/// <summary>
+/// Address DTO
+/// </summary>
+public record DireccionDto(
+    string? Calle,
+    string? Colonia,
+    string? Ciudad,
+    string? Estado,
+    string? CodigoPostal
+);
+
+/// <summary>
+/// Contact DTO
+/// </summary>
+public record ContactoDto(
+    Guid Id,
+    string Nombre,
+    string? Email,
+    string? Telefono,
+    bool Principal
+);
+
+/// <summary>
+/// Invoice DTO for client detail
+/// </summary>
+public record FacturaDto(
+    Guid Id,
+    string Folio,
+    DateTime Fecha,
+    DateTime Vencimiento,
+    decimal Total,
+    decimal Saldo,
+    int DiasVencido,
+    string Status
+);

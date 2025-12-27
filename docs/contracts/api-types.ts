@@ -634,3 +634,52 @@ export interface ClientesPaginationMeta {
   total: number;
   totalPages: number;
 }
+
+// ============================================================
+// CLIENTE DETAIL RESPONSES (M3)
+// ============================================================
+
+export interface ClienteDetailResponse {
+  id: UUID;
+  clave: string;
+  nombre: string;
+  rfc?: string;
+  email?: string;
+  telefono?: string;
+  direccion?: DireccionDto;
+  saldoTotal: Money;
+  saldoVencido: Money;
+  diasMaxVencido: number;
+  facturasActivas: number;
+  ultimoPago?: ISODate;
+  lastSyncAt?: ISODate;
+  contactos: ContactoDto[];
+  facturas: FacturaDto[];
+}
+
+export interface DireccionDto {
+  calle?: string;
+  colonia?: string;
+  ciudad?: string;
+  estado?: string;
+  codigoPostal?: string;
+}
+
+export interface ContactoDto {
+  id: UUID;
+  nombre: string;
+  email?: string;
+  telefono?: string;
+  principal: boolean;
+}
+
+export interface FacturaDto {
+  id: UUID;
+  folio: string;
+  fecha: ISODate;
+  vencimiento: ISODate;
+  total: Money;
+  saldo: Money;
+  diasVencido: number;
+  status: string;
+}

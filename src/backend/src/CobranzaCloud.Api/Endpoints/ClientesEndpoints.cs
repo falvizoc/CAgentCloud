@@ -24,6 +24,13 @@ public static class ClientesEndpoints
             .WithDescription("Get paginated list of clients with optional filters")
             .Produces<ClientesListResponse>(200)
             .Produces<ProblemDetails>(401);
+
+        group.MapGet("/{id:guid}", GetClienteById)
+            .WithName("GetClienteById")
+            .WithDescription("Get client detail by ID including contacts and invoices")
+            .Produces<ClienteDetailResponse>(200)
+            .Produces<ProblemDetails>(401)
+            .Produces<ProblemDetails>(404);
     }
 
     private static async Task<IResult> GetClientes(
@@ -107,6 +114,87 @@ public static class ClientesEndpoints
                 Total: total,
                 TotalPages: (int)Math.Ceiling(total / (double)pageSize)
             )
+        );
+
+        return Results.Ok(response);
+    }
+
+    private static async Task<IResult> GetClienteById(
+        Guid id,
+        ClaimsPrincipal principal,
+        AppDbContext db,
+        ILogger<Program> logger,
+        CancellationToken ct)
+    {
+        var orgId = principal.GetOrganizationId();
+
+        logger.LogDebug("Getting cliente {ClienteId} for org {OrgId}", id, orgId);
+
+        var cliente = await db.Clientes
+            .Include(c => c.Contactos)
+            .Include(c => c.Facturas.Where(f => f.Status != Core.Entities.FacturaStatus.Pagada
+                                              && f.Status != Core.Entities.FacturaStatus.Cancelada))
+            .FirstOrDefaultAsync(c => c.Id == id && c.OrganizationId == orgId, ct);
+
+        if (cliente == null)
+        {
+            return Results.Problem(
+                title: "Cliente no encontrado",
+                detail: "El cliente solicitado no existe o no pertenece a su organizacion",
+                statusCode: 404
+            );
+        }
+
+        var direccion = (cliente.Calle != null || cliente.Colonia != null ||
+                        cliente.Ciudad != null || cliente.Estado != null || cliente.CodigoPostal != null)
+            ? new DireccionDto(
+                cliente.Calle,
+                cliente.Colonia,
+                cliente.Ciudad,
+                cliente.Estado,
+                cliente.CodigoPostal
+            )
+            : null;
+
+        var response = new ClienteDetailResponse(
+            Id: cliente.Id,
+            Clave: cliente.Clave,
+            Nombre: cliente.Nombre,
+            Rfc: cliente.Rfc,
+            Email: cliente.Email,
+            Telefono: cliente.Telefono,
+            Direccion: direccion,
+            SaldoTotal: cliente.SaldoTotal,
+            SaldoVencido: cliente.SaldoVencido,
+            DiasMaxVencido: cliente.DiasMaxVencido,
+            FacturasActivas: cliente.FacturasActivas,
+            UltimoPago: cliente.UltimoPago,
+            LastSyncAt: cliente.LastSyncAt,
+            Contactos: cliente.Contactos
+                .OrderByDescending(c => c.Principal)
+                .ThenBy(c => c.Nombre)
+                .Select(c => new ContactoDto(
+                    c.Id,
+                    c.Nombre,
+                    c.Email,
+                    c.Telefono,
+                    c.Principal
+                ))
+                .ToList(),
+            Facturas: cliente.Facturas
+                .OrderByDescending(f => f.DiasVencido)
+                .ThenByDescending(f => f.Saldo)
+                .Select(f => new FacturaDto(
+                    f.Id,
+                    f.Folio,
+                    f.Fecha,
+                    f.Vencimiento,
+                    f.Total,
+                    f.Saldo,
+                    f.DiasVencido,
+                    f.Status.ToString()
+                ))
+                .ToList()
         );
 
         return Results.Ok(response);
