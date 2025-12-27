@@ -750,18 +750,36 @@ if (app.Environment.IsDevelopment())
 
 ---
 
-## 18. Próximos Pasos Inmediatos
+## 18. Protocolo de Sesiones
+
+> **IMPORTANTE**: Al iniciar o cerrar sesión, leer `.claude/PROTOCOL.md`
+
+| Comando Usuario | Acción Claude |
+|-----------------|---------------|
+| "abre sesión" / "inicio" / "buenos días" | Ejecutar protocolo de apertura |
+| "cierra sesión" / "termina" / "hasta mañana" | Ejecutar protocolo de cierre |
+
+El protocolo garantiza:
+- Sincronización con git antes de trabajar
+- Documentación del trabajo realizado
+- Commits y push antes de cerrar
+- Continuidad entre sesiones
+
+---
+
+## 19. Próximos Pasos Inmediatos
 
 1. ✅ Revisar memoria de traslado
 2. ✅ Crear CLAUDE.md (este documento)
 3. ✅ Crear estructura docs/
 4. ✅ Definir milestones y agentes
 5. ✅ Documentar FRICTIONLESS, IA, Email, Testing
-6. ⏳ Configurar proyecto base (Docker Compose)
-7. ⏳ Crear estructura de código
+6. ✅ Configurar proyecto base (Docker Compose)
+7. ✅ Crear estructura de código
+8. ✅ Integración ASPEL connector (M3)
 
 ---
 
 *Documento creado: 2025-12-22*
-*Última actualización: 2025-12-23*
-*Próxima revisión: Al completar Milestone M0*
+*Última actualización: 2025-12-27*
+*Próxima revisión: Al completar Milestone M4*
