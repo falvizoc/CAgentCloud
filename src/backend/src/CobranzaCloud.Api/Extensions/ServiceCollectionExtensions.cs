@@ -1,12 +1,14 @@
 using System.Text;
 using CobranzaCloud.Application.Auth;
 using CobranzaCloud.Application.Connectors;
+using CobranzaCloud.Application.ExternalServices;
 using CobranzaCloud.Infrastructure.Data;
 using CobranzaCloud.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace CobranzaCloud.Api.Extensions;
 
@@ -35,6 +37,45 @@ public static class ServiceCollectionExtensions
         // Health Checks
         services.AddHealthChecks()
             .AddNpgSql(configuration.GetConnectionString("DefaultConnection") ?? "");
+
+        // Redis Cache
+        services.AddRedisCache(configuration);
+
+        // Cobranza Agent Client (ASPEL Connector)
+        services.AddCobranzaAgentClient(configuration);
+
+        return services;
+    }
+
+    public static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+    {
+        var redisConnection = configuration.GetConnectionString("Redis") ?? "localhost:6379";
+
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var options = ConfigurationOptions.Parse(redisConnection);
+            options.AbortOnConnectFail = false;
+            return ConnectionMultiplexer.Connect(options);
+        });
+
+        services.AddScoped<ICacheService, RedisCacheService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddCobranzaAgentClient(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Bind configuration
+        services.Configure<CobranzaAgentOptions>(configuration.GetSection(CobranzaAgentOptions.SectionName));
+
+        // Register HttpClient with configuration
+        services.AddHttpClient<ICobranzaAgentClient, CobranzaAgentClient>()
+            .ConfigureHttpClient((sp, client) =>
+            {
+                var options = configuration.GetSection(CobranzaAgentOptions.SectionName).Get<CobranzaAgentOptions>()
+                    ?? new CobranzaAgentOptions();
+                client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+            });
 
         return services;
     }

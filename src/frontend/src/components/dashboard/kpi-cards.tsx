@@ -53,10 +53,20 @@ function KpiCardSkeleton() {
 
 export function KpiCardsSkeleton() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {[...Array(4)].map((_, i) => (
-        <KpiCardSkeleton key={i} />
-      ))}
+    <div className="space-y-4">
+      {/* Friendly loading message - FRICTIONLESS */}
+      <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg border border-primary/10">
+        <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
+        <div>
+          <p className="text-sm font-medium">Sincronizando con tu ERP...</p>
+          <p className="text-xs text-muted-foreground">Obteniendo datos actualizados de tu cartera</p>
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <KpiCardSkeleton key={i} />
+        ))}
+      </div>
     </div>
   );
 }

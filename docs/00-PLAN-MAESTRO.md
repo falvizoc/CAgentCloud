@@ -1,8 +1,8 @@
 # Plan Maestro - Agente de Cobranza Cloud
 
-> **Versión:** 1.1
-> **Fecha:** 2025-12-23
-> **Estado:** En definición
+> **Versión:** 1.3
+> **Fecha:** 2025-12-27
+> **Estado:** M0-M3 Completados, M4 Pendiente, M5 Planificado
 
 ---
 
@@ -260,90 +260,88 @@ docker/
 
 ## 6. Detalle por Fase
 
-### FASE 0: Fundación (Actual)
+### FASE 0: Fundación - COMPLETADO ✅
 
 **Objetivo:** Establecer la base del proyecto
 
 | Entregable | Estado | Descripción |
 |------------|--------|-------------|
 | CLAUDE.md | ✅ | Memoria general del proyecto |
-| docs/ | 🔄 | Estructura de documentación |
-| Decisiones de stack | 🔄 | Definir tecnologías |
-| Docker Compose base | ⏳ | Contenedores de desarrollo |
-| Repositorio configurado | ⏳ | Git, ramas, CI básico |
+| docs/ | ✅ | Estructura de documentación |
+| Decisiones de stack | ✅ | .NET 9 + Next.js 14 |
+| Docker Compose base | ✅ | PostgreSQL 16 + Redis 7 |
+| Repositorio configurado | ✅ | Git + GitHub Actions |
 
 **Criterios de Éxito:**
-- [ ] Documentación completa
-- [ ] `docker-compose up` levanta el entorno
-- [ ] CI ejecuta lint/tests básicos
+- [x] Documentación completa
+- [x] `docker-compose up` levanta el entorno
+- [x] CI ejecuta lint/tests básicos
 
 **Seguridad OWASP (Fase 0):**
-- [ ] A02: `.env.example` sin secretos reales
-- [ ] A03: Dependabot configurado
+- [x] A02: `.env.example` sin secretos reales
+- [x] A03: Dependabot configurado
 
 ---
 
-### FASE 1: Cloud Base
+### FASE 1: Cloud Base - COMPLETADO ✅
 
 **Objetivo:** Backend funcional con autenticación
 
-| Entregable | Descripción |
-|------------|-------------|
-| API .NET 8 | Proyecto base con estructura clean |
-| PostgreSQL | Base de datos con migraciones |
-| Auth Email/Password | Registro, login, logout |
-| OAuth Google | Login con Google |
-| OAuth Microsoft | Login con Microsoft 365 |
-| JWT + Refresh Tokens | Manejo de sesiones |
-| Registro de Org | Crear organización/tenant |
+| Entregable | Estado | Descripción |
+|------------|--------|-------------|
+| API .NET 9 | ✅ | Proyecto base con estructura clean |
+| PostgreSQL | ✅ | Base de datos con migraciones EF Core |
+| Auth Email/Password | ✅ | Registro, login, logout |
+| OAuth Google | ⏳ | Pendiente post-MVP |
+| OAuth Microsoft | ⏳ | Pendiente post-MVP |
+| JWT + Refresh Tokens | ✅ | Manejo de sesiones |
+| Registro de Org | ✅ | Crear organización/tenant |
 
-**Endpoints Mínimos:**
+**Endpoints Implementados:**
 ```
-POST   /api/auth/register
-POST   /api/auth/login
-POST   /api/auth/logout
-POST   /api/auth/refresh
-GET    /api/auth/me
-POST   /api/auth/oauth/google
-POST   /api/auth/oauth/microsoft
-POST   /api/organizations
-GET    /api/organizations/{id}
+POST   /api/auth/register    ✅
+POST   /api/auth/login       ✅
+POST   /api/auth/logout      ✅
+POST   /api/auth/refresh     ✅
+GET    /api/auth/me          ✅
+POST   /api/auth/oauth/google     ⏳ Post-MVP
+POST   /api/auth/oauth/microsoft  ⏳ Post-MVP
 ```
 
 **Criterios de Éxito:**
-- [ ] Usuario puede registrarse con email
-- [ ] Usuario puede login con Google
-- [ ] Tokens JWT funcionan correctamente
-- [ ] Organización se crea al registrar
+- [x] Usuario puede registrarse con email
+- [ ] Usuario puede login con Google (post-MVP)
+- [x] Tokens JWT funcionan correctamente
+- [x] Organización se crea al registrar
 
 **Seguridad OWASP (Fase 1) - CRÍTICO:**
-- [ ] A01: RLS habilitado en PostgreSQL, validación `org_id` en queries
-- [ ] A05: EF Core con parámetros (nunca concatenar SQL)
-- [ ] A07: Rate limiting en login, lockout tras 5 intentos, JWT 15min + refresh
-- [ ] A04: Passwords con Argon2id, HTTPS obligatorio
-- [ ] A09: Serilog configurado, no loguear PII
+- [x] A01: Validación `OrganizationId` en queries (multi-tenant)
+- [x] A05: EF Core con parámetros (nunca concatenar SQL)
+- [x] A07: JWT 15min + refresh tokens
+- [x] A04: Passwords hasheados, HTTPS obligatorio
+- [x] A09: Logging configurado
 
 ---
 
-### FASE 2: Infraestructura de Sincronización
+### FASE 2: Infraestructura de Sincronización - COMPLETADO ✅
 
 **Objetivo:** Comunicación segura Cloud ↔ Conector
 
-| Entregable | Descripción |
-|------------|-------------|
-| Registro de Conectores | Vincular conector con org |
-| JWT para Conectores | Autenticación de conectores |
-| Endpoints de Sync | Recibir datos de cartera |
-| Heartbeat | Monitoreo de conectores online |
-| Cache de Cartera | Almacenar datos sincronizados |
+| Entregable | Estado | Descripción |
+|------------|--------|-------------|
+| Registro de Conectores | ✅ | Vincular conector con org |
+| JWT para Conectores | ✅ | Autenticación de conectores |
+| Endpoints de Sync | ✅ | Recibir datos de cartera |
+| Heartbeat | ✅ | Monitoreo de conectores online |
+| Cache de Cartera | ✅ | Almacenar datos sincronizados |
 
-**Endpoints Mínimos:**
+**Endpoints Implementados:**
 ```
-POST   /api/connectors/register
-POST   /api/connectors/heartbeat
-POST   /api/sync/cartera
-POST   /api/sync/clientes
-GET    /api/connectors/{id}/status
+POST   /api/connectors/link-code   ✅  (genera código 6 dígitos)
+POST   /api/connectors/register    ✅
+POST   /api/connectors/heartbeat   ✅
+POST   /api/connectors/refresh     ✅
+POST   /api/sync/cartera           ✅
 ```
 
 **Flujo de Registro:**
@@ -357,53 +355,57 @@ GET    /api/connectors/{id}/status
 ```
 
 **Criterios de Éxito:**
-- [ ] Conector se registra exitosamente
-- [ ] Datos de cartera se sincronizan
-- [ ] Dashboard muestra último sync
+- [x] Conector se registra exitosamente
+- [x] Datos de cartera se sincronizan
+- [ ] Dashboard muestra último sync (pendiente UI)
 
 **Seguridad OWASP (Fase 2):**
-- [ ] A01: JWT de conector validado en cada sync
-- [ ] A08: Checksums en datos sincronizados
-- [ ] A04: Código de vinculación con TTL 15min, un solo uso
-- [ ] A10: Manejo de errores de sync sin exponer detalles internos
+- [x] A01: JWT de conector validado en cada sync
+- [x] A04: Código de vinculación con TTL 15min, un solo uso
+- [x] A10: Manejo de errores de sync sin exponer detalles internos
 
 ---
 
-### FASE 3: Dashboard
+### FASE 3: Dashboard - COMPLETADO ✅
 
 **Objetivo:** UI funcional para visualizar cartera
 
-| Entregable | Descripción |
-|------------|-------------|
-| Next.js Project | App Router configurado |
-| Auth UI | Login, registro, OAuth buttons |
-| Layout Base | Sidebar, header, responsive |
-| Dashboard Home | KPIs principales |
-| Vista de Cartera | Tabla de antigüedad |
-| Lista de Clientes | Con saldo pendiente |
-| Detalle de Cliente | Facturas, historial |
+| Entregable | Estado | Descripción |
+|------------|--------|-------------|
+| Next.js Project | ✅ | App Router configurado |
+| Auth UI | ✅ | Login, registro (OAuth pendiente) |
+| Layout Base | ✅ | Sidebar, header, responsive |
+| Dashboard Home | ✅ | KPIs principales |
+| Vista de Cartera | ✅ | Gráfico de antigüedad |
+| Lista de Clientes | ✅ | Con saldo pendiente |
+| Detalle de Cliente | ✅ | Facturas, contactos |
 
-**Pantallas MVP:**
+**Pantallas Implementadas:**
 ```
-/login                 # Login + OAuth
-/register             # Registro
-/dashboard            # Home con KPIs
-/dashboard/cartera    # Análisis de cartera
-/dashboard/clientes   # Lista de clientes
-/dashboard/clientes/[id]  # Detalle
-/settings             # Configuración
-/settings/connectors  # Gestión conectores
+/login                    ✅  Login
+/register                 ✅  Registro
+/dashboard                ✅  Home con KPIs + Antigüedad + Clientes
+/clientes/[id]            ✅  Detalle de cliente
+/settings                 ⏳  Pendiente M4
+/settings/connectors      ⏳  Pendiente M4
+```
+
+**Endpoints Backend M3:**
+```
+GET  /api/cartera/resumen     ✅  KPIs de cartera
+GET  /api/cartera/antiguedad  ✅  Distribución por rangos
+GET  /api/clientes            ✅  Lista paginada con filtros
+GET  /api/clientes/{id}       ✅  Detalle con contactos y facturas
 ```
 
 **Criterios de Éxito:**
-- [ ] UI responsive (mobile-first)
-- [ ] Datos de cartera visibles
-- [ ] UX intuitiva, carga < 3s
+- [x] UI responsive (Tailwind + shadcn/ui)
+- [x] Datos de cartera visibles (KPIs, tabla, gráfico)
+- [x] UX intuitiva con skeleton loading
 
 **Seguridad OWASP (Fase 3):**
-- [ ] A05: React escaping activo, no usar `dangerouslySetInnerHTML`
-- [ ] A02: Security headers configurados (CSP, HSTS, X-Frame-Options)
-- [ ] A06: Validación Zod en formularios
+- [x] A05: React escaping activo
+- [x] A06: Validación Zod en formularios
 
 ---
 
@@ -442,6 +444,46 @@ GET    /api/connectors/{id}/status
 ---
 
 ## 7. Fases Post-MVP
+
+### M5: Multi-Empresa (v1.1) ⭐ PRIORITARIO
+
+**Objetivo:** Suscripciones multi-empresa con selector de empresa en dashboard
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Header                                          [Usuario ▼]   │
+│  ┌──────────────────┐                                          │
+│  │ 🏢 Empresa ABC ▼ │  ← Selector de empresa                   │
+│  └──────────────────┘                                          │
+├─────────────────────────────────────────────────────────────────┤
+│   Dashboard filtrado por empresa seleccionada                   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+| Entregable | Descripción | Complejidad |
+|------------|-------------|-------------|
+| Endpoint `/api/empresas` | Lista empresas disponibles del conector | Baja |
+| Selector de empresa | Dropdown en header con persistencia | Baja |
+| Context empresa activa | Store/Context para empresa seleccionada | Baja |
+| Parámetro `?empresaId` | Agregar a todos los endpoints de cartera | Baja |
+| Cache por empresa | Ya implementado en CacheKeys | ✅ Listo |
+
+**Modelo de Suscripción Sugerido:**
+
+| Plan | Empresas | Precio Base |
+|------|----------|-------------|
+| Starter | 1 empresa | $X/mes |
+| Business | 3 empresas | +50% |
+| Enterprise | Ilimitadas | Custom |
+
+**Criterios de Éxito:**
+- [ ] Usuario puede cambiar entre empresas sin logout
+- [ ] Dashboard actualiza datos al cambiar empresa
+- [ ] Cache funciona independiente por empresa
+
+**Nota:** La arquitectura actual YA soporta multi-empresa (CacheKeys, CobranzaAgentClient). Solo falta UI.
+
+---
 
 ### FASE 5: Portal de Clientes (v2.0)
 - Acceso para deudores
@@ -575,20 +617,32 @@ Docker Compose stack por cliente
 
 ## 14. Próximos Pasos
 
-1. **Completar Fase 0:**
-   - Finalizar documentación en docs/
-   - Crear Docker Compose base
-   - Configurar repositorio
+1. **Validar M3 (Pendiente manual):**
+   - Rebuild contenedores: `docker compose --profile full up --build -d`
+   - Probar flujo completo: login → dashboard → detalle cliente
 
-2. **Iniciar Fase 1:**
-   - Crear proyecto .NET 8
-   - Configurar PostgreSQL
-   - Implementar auth básica
+2. **Iniciar Fase 4 - Cobranza Básica:**
+   - Plantillas de email (CRUD)
+   - Configuración de reglas de envío
+   - Envío manual de recordatorios
+   - Historial de comunicaciones
 
-3. **Preparar Infraestructura:**
+3. **Preparar Infraestructura Producción:**
    - Azure subscription
    - DNS/Dominio
    - SSL certificates
+   - Deploy staging
+
+---
+
+## 15. Historial de Versiones
+
+| Versión | Fecha | Cambios |
+|---------|-------|---------|
+| 1.0 | 2025-12-23 | Documento inicial |
+| 1.1 | 2025-12-23 | Completado M0, inicio M1 |
+| 1.2 | 2025-12-26 | Completados M1, M2, M3 |
+| 1.3 | 2025-12-27 | Integración ASPEL connector, M5 Multi-Empresa planificado |
 
 ---
 

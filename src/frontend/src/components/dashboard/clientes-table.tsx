@@ -107,14 +107,14 @@ export function ClientesTable() {
           </TableHeader>
           <TableBody>
             {data.items.map((cliente) => (
-              <TableRow key={cliente.id} className="cursor-pointer hover:bg-muted/50">
+              <TableRow key={cliente.clave} className="cursor-pointer hover:bg-muted/50">
                 <TableCell className="font-medium font-mono text-xs">
-                  <Link href={`/clientes/${cliente.id}`} className="hover:underline">
+                  <Link href={`/clientes/${encodeURIComponent(cliente.clave)}`} className="hover:underline">
                     {cliente.clave}
                   </Link>
                 </TableCell>
                 <TableCell className="max-w-[200px] truncate">
-                  <Link href={`/clientes/${cliente.id}`} className="hover:underline">
+                  <Link href={`/clientes/${encodeURIComponent(cliente.clave)}`} className="hover:underline">
                     {cliente.nombre}
                   </Link>
                 </TableCell>

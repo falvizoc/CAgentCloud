@@ -75,16 +75,16 @@ export function useClientes(params?: {
 }
 
 /**
- * Hook to fetch cliente detail by ID
+ * Hook to fetch cliente detail by clave
  */
-export function useClienteDetalle(id: string | undefined) {
+export function useClienteDetalle(clave: string | undefined) {
   return useQuery({
-    queryKey: ['clientes', id],
+    queryKey: ['clientes', 'detail', clave],
     queryFn: async () => {
-      const response = await apiClient.get<ClienteDetailResponse>(`/api/clientes/${id}`);
+      const response = await apiClient.get<ClienteDetailResponse>(`/api/clientes/${encodeURIComponent(clave!)}`);
       return response.data;
     },
-    enabled: !!id,
+    enabled: !!clave,
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 }

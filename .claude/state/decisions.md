@@ -170,6 +170,60 @@
 
 ---
 
+## DEC-009: Moneda MXN como Estándar por Defecto
+
+**Fecha**: 2025-12-27
+**Estado**: Aceptada
+**Contexto**: El conector ASPEL soporta múltiples monedas (MXN=1, USD=2). Sin parámetro de moneda, la API suma aritméticamente ambas monedas sin conversión, lo cual puede dar datos incorrectos.
+
+**Decisión**:
+- **MUST**: Todas las consultas al conector ASPEL usan `?moneda=1` (MXN) por defecto
+- El usuario puede opcionalmente consultar en otra moneda desde el dashboard
+- Los datos cacheados se almacenan por moneda separadamente
+- La UI muestra MXN a menos que el usuario cambie la preferencia
+
+**Consecuencias**:
+- ✅ Datos consistentes y precisos en pesos mexicanos
+- ✅ Evita confusión por mezcla de monedas
+- ✅ Cache eficiente por moneda
+- ⚠️ Para ver USD, usuario debe cambiar filtro explícitamente
+- ⚠️ Reportes multi-moneda requieren consultas separadas
+
+**Implementación**:
+- Parámetro `moneda=1` obligatorio en todas las llamadas al conector
+- Redis keys incluyen sufijo de moneda: `cartera:01:resumen:MXN`
+- Frontend muestra selector de moneda (default: MXN)
+
+---
+
+## DEC-010: Redis Cache para Datos del Conector
+
+**Fecha**: 2025-12-27
+**Estado**: Aceptada
+**Contexto**: Las consultas al conector ASPEL son lentas (lectura directa de Firebird). Necesitamos cache para mejor UX.
+
+**Decisión**:
+- Usar Redis (ya configurado en Docker) como cache de datos del conector
+- TTL de 15 minutos (alineado con ciclo de sync del conector)
+- Cache keys por organización, empresa y moneda
+- Invalidación manual disponible vía endpoint
+
+**Consecuencias**:
+- ✅ Dashboard carga en < 1 segundo
+- ✅ Reduce carga en el conector remoto
+- ✅ Resilencia: datos disponibles si conector offline temporalmente
+- ⚠️ Datos pueden estar 15 min desactualizados
+- ⚠️ Requiere estrategia de invalidación
+
+**Cache Keys**:
+```
+cobranza:{orgId}:{empresaId}:resumen:{moneda}
+cobranza:{orgId}:{empresaId}:antiguedad:{moneda}
+cobranza:{orgId}:{empresaId}:clientes:page:{n}
+```
+
+---
+
 ## [Plantilla para nuevas decisiones]
 
 <!--

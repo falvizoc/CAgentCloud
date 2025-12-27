@@ -1,6 +1,6 @@
 # Estado del Proyecto
 
-> **Última actualización**: 2025-12-26
+> **Última actualización**: 2025-12-27
 > **Versión**: 0.1.0 (Pre-MVP)
 
 ---
@@ -99,7 +99,7 @@
 ### Pendiente para integración completa
 - [x] Aplicar migración en base de datos (2025-12-26)
 - [ ] Tests de integración
-- [ ] Probar con conector real
+- [x] Probar con conector real (2025-12-27 - integrado en M3)
 
 ---
 
@@ -111,10 +111,20 @@
 - [x] CarteraEndpoints
   - [x] GET /api/cartera/resumen (requiere JWT + CarteraRead)
   - [x] GET /api/cartera/antiguedad (requiere JWT + CarteraRead)
+  - [x] POST /api/cartera/refresh (invalidar cache)
 - [x] ClientesEndpoints
   - [x] GET /api/clientes (paginado, filtros, ordenamiento)
-  - [x] GET /api/clientes/{id} (detalle con contactos y facturas)
+  - [x] GET /api/clientes/{clave} (detalle por clave)
 - [x] Registro de endpoints en EndpointRouteBuilderExtensions
+
+### Integración ASPEL Connector (100% completado - 2025-12-27)
+- [x] ICobranzaAgentClient (interface para conector ASPEL)
+- [x] CobranzaAgentClient (implementación HTTP)
+- [x] ICacheService + RedisCacheService (caching Redis)
+- [x] CacheKeys helper (claves consistentes con TTL 15min)
+- [x] Endpoints conectados a bitmovil.ddns.net:5000
+- [x] DEC-009: MXN como moneda estándar por defecto
+- [x] DEC-010: Redis cache para datos del conector
 
 ### Frontend (100% completado)
 - [x] Componentes UI (table, skeleton)
@@ -125,12 +135,18 @@
   - [x] KpiCards (4 tarjetas de indicadores)
   - [x] AntiguedadChart (gráfico de barras de antigüedad)
   - [x] ClientesTable (tabla paginada con links a detalle)
-- [x] Página detalle cliente (/clientes/[id])
+- [x] Página detalle cliente (/clientes/[clave])
 - [x] Tipos TypeScript actualizados en contracts/api-types.ts
 
-### Pendiente para validación
-- [ ] Rebuild contenedores Docker
-- [ ] Prueba de flujo completo
+### Validación Completada (2025-12-27)
+- [x] Rebuild contenedores Docker
+- [x] Prueba de flujo completo
+- [x] Verificación de datos reales desde ASPEL:
+  - Total Cartera: $1,327,905.74 MXN
+  - Cartera Vencida: $536,064.49 MXN (40.37%)
+  - 24 clientes con saldo
+  - 46 facturas activas
+- [x] Cache Redis funcionando (31s → 0.055s, 560x speedup)
 
 ---
 

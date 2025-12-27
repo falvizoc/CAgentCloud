@@ -221,7 +221,8 @@ public static class AuthEndpoints
             token.ReasonRevoked = "Replaced by new login";
         }
 
-        user.RefreshTokens.Add(refreshToken);
+        // Add to DbSet directly to avoid tracking issues
+        db.Set<RefreshToken>().Add(refreshToken);
         await db.SaveChangesAsync(ct);
 
         logger.LogInformation("User logged in: {Email}", user.Email);

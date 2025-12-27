@@ -50,8 +50,8 @@ function DetailSkeleton() {
 export default function ClienteDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
-  const { data: cliente, isLoading, isError } = useClienteDetalle(id);
+  const clave = decodeURIComponent(params.id as string); // id param is actually the clave
+  const { data: cliente, isLoading, isError } = useClienteDetalle(clave);
 
   if (isLoading) {
     return <DetailSkeleton />;

@@ -34,7 +34,24 @@
       "Bash(dotnet nuget:*)",
       "Bash(powershell.exe -Command \"docker ps --format ''table {{.Names}}\\\\t{{.Status}}\\\\t{{.Ports}}''\")",
       "Bash(/mnt/c/Program\\\\ Files/Docker/Docker/resources/bin/docker.exe ps:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" ps --format \"table {{.Names}}\\\\t{{.Status}}\\\\t{{.Ports}}\")",
+      "Bash(cmd.exe /c \"docker ps --format \"\"table {{.Names}}\\\\t{{.Status}}\\\\t{{.Ports}}\"\"\")",
+      "Bash(powershell.exe:*)",
+      "Bash(dotnet ef database update:*)",
+      "Bash(dotnet ef migrations list:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(taskkill:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx next build:*)",
+      "Bash(git -C \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\" diff --stat)",
+      "Bash(git -C \"c:\\\\Users\\\\FranciscoAlvizo\\\\Documents\\\\Dev\\\\CAgentCloud\" commit -m \"$\\(cat <<''EOF''\nfeat\\(M3\\): add client detail endpoint and page\n\nBackend:\n- GET /api/clientes/{id} endpoint with contacts and invoices\n- DTOs: ClienteDetailResponse, DireccionDto, ContactoDto, FacturaDto\n\nFrontend:\n- Client detail page at /clientes/[id]\n- useClienteDetalle hook\n- Clickable links in clients table\n\nCompletes M3: Dashboard MVP milestone\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5OGY2MmJhMy1jN2FiLTRmN2MtOWUzYS1iODhmNmQ2MjBlYmMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJqdGkiOiIzOTllMDMwOS02MWUyLTQxMGItOTgyNS02ZjhlN2U5MTRkYTkiLCJuYW1lIjoiVGVzdCBVc2VyIiwib3JnX2lkIjoiZjA5NWZlMDAtMzJhOC00NGFiLWI1NWQtMDI1MjIyMWU2YWU5Iiwicm9sZSI6Im93bmVyIiwicGVybWlzc2lvbnMiOlsidXNlcnM6KiIsImNhcnRlcmE6KiIsImNsaWVudGVzOioiLCJjb25uZWN0b3JzOioiLCJzZXR0aW5nczoqIiwiYmlsbGluZzoqIl0sImV4cCI6MTc2Njc5Njk1OSwiaXNzIjoiQ29icmFuemFDbG91ZCIsImF1ZCI6IkNvYnJhbnphQ2xvdWQifQ.-Uv4wSC5NgjCSVX67a1boRTtHLF6cL2pGcUpbAK2eWc\")",
+      "Bash(echo \"=== GET /api/cartera/resumen ===\" curl -s http://localhost:5000/api/cartera/resumen -H \"Authorization: Bearer $TOKEN\")",
+      "Bash(echo \"\" echo \"=== GET /api/cartera/antiguedad ===\" curl -s http://localhost:5000/api/cartera/antiguedad -H \"Authorization: Bearer $TOKEN\")",
+      "Bash(echo \"\" echo \"=== GET /api/clientes ===\" curl -s \"http://localhost:5000/api/clientes?page=1&pageSize=5\" -H \"Authorization: Bearer $TOKEN\")",
+      "Bash(mkdir:*)"
     ]
   }
 }

@@ -5,30 +5,76 @@
 
 ---
 
+## Sesion 20251227-fullstack-004
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2025-12-27 |
+| **Agente** | Fullstack (Opus 4.5) |
+| **Milestone** | M3 Dashboard MVP - Integracion ASPEL |
+| **Duracion** | ~3 horas |
+
+### Completado
+- Integracion completa con conector ASPEL (bitmovil.ddns.net:5000)
+- ICobranzaAgentClient: interface HTTP para conector
+- CobranzaAgentClient: implementacion con X-API-Key auth
+- ICacheService + RedisCacheService: caching con TTL 15min
+- CacheKeys helper: claves consistentes por org/empresa/moneda
+- CarteraEndpoints: refactorizado para usar conector + cache
+- ClientesEndpoints: refactorizado para usar conector + cache
+- DEC-009: MXN como moneda estandar por defecto
+- DEC-010: Redis cache para datos del conector
+- Documentacion API conector: docs/contracts/COBRANZA-AGENT-API.md
+- UX FRICTIONLESS: mensaje "Sincronizando con tu ERP..." durante carga
+- M5 Multi-Empresa agregado al Plan Maestro
+
+### Datos Verificados desde ASPEL
+- Total Cartera: $1,327,905.74 MXN
+- Cartera Vencida: $536,064.49 MXN (40.37%)
+- 24 clientes con saldo
+- 46 facturas activas
+- Cache: 31s -> 0.055s (560x speedup)
+
+### Pendiente para siguiente sesion
+- Iniciar M4: Cobranza Basica
+- OAuth Google/Microsoft (opcional)
+- Tests de integracion
+
+### Notas
+- Arquitectura PULL: Cloud consume datos desde conector (no PUSH)
+- Frontend usa clave cliente en lugar de GUID para navegacion
+- Cache por empresa ya soportado para M5 Multi-Empresa
+
+---
+
 ## Sesion 20251226-fullstack-003
 
 | Campo | Valor |
 |-------|-------|
 | **Fecha** | 2025-12-26 |
 | **Agente** | Fullstack (Opus 4.5) |
-| **Milestone** | M2 → M3 Dashboard MVP |
-| **Duracion** | ~1.5 horas |
+| **Milestone** | M3 Dashboard MVP - COMPLETADO |
+| **Duracion** | ~2 horas |
 
 ### Completado
 - Aplicar migracion M2 en base de datos
 - Backend M3: DTOs, CarteraEndpoints, ClientesEndpoints
+- Backend: GET /api/clientes/{id} con contactos y facturas
 - Frontend M3: Dashboard layout, page, hooks, componentes
+- Frontend: Pagina detalle cliente /clientes/[id]
 - Tipos TypeScript actualizados
+- Commit M3 completo (d52e558, 4041dff)
 
 ### Pendiente para siguiente sesion
 - Rebuild contenedores Docker
 - Prueba de flujo completo
-- Commit de M3
+- Iniciar M4: Cobranza Basica
 
 ### Notas
 - Backend compila correctamente
 - Frontend requiere Node.js 20+ (Docker lo tiene)
-- 12 archivos nuevos creados
+- 15 archivos nuevos creados
+- M3 100% completado
 
 ---
 

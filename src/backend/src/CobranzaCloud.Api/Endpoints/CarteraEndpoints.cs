@@ -1,15 +1,19 @@
 using System.Security.Claims;
 using CobranzaCloud.Api.Extensions;
 using CobranzaCloud.Application.Cartera;
+using CobranzaCloud.Application.ExternalServices;
 using CobranzaCloud.Core.Entities;
 using CobranzaCloud.Infrastructure.Data;
+using CobranzaCloud.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace CobranzaCloud.Api.Endpoints;
 
 /// <summary>
 /// Portfolio/cartera summary endpoints for dashboard
+/// Fetches data from Cobranza Agent (ASPEL connector) with Redis caching
 /// </summary>
 public static class CarteraEndpoints
 {
@@ -22,135 +26,167 @@ public static class CarteraEndpoints
 
         group.MapGet("/resumen", GetResumen)
             .WithName("GetCarteraResumen")
-            .WithDescription("Get portfolio summary with totals and KPIs")
+            .WithDescription("Get portfolio summary with totals and KPIs from ASPEL connector")
             .Produces<CarteraResumenResponse>(200)
-            .Produces<ProblemDetails>(401);
+            .Produces<ProblemDetails>(401)
+            .Produces<ProblemDetails>(503);
 
         group.MapGet("/antiguedad", GetAntiguedad)
             .WithName("GetCarteraAntiguedad")
-            .WithDescription("Get portfolio aging report by range")
+            .WithDescription("Get portfolio aging report by range from ASPEL connector")
             .Produces<CarteraAntiguedadResponse>(200)
+            .Produces<ProblemDetails>(401)
+            .Produces<ProblemDetails>(503);
+
+        group.MapPost("/refresh", RefreshCache)
+            .WithName("RefreshCarteraCache")
+            .WithDescription("Force refresh cartera data from connector")
+            .Produces(204)
             .Produces<ProblemDetails>(401);
     }
 
     private static async Task<IResult> GetResumen(
         ClaimsPrincipal principal,
-        AppDbContext db,
+        ICobranzaAgentClient agentClient,
+        ICacheService cache,
+        IOptions<CobranzaAgentOptions> options,
         ILogger<Program> logger,
         CancellationToken ct)
     {
         var orgId = principal.GetOrganizationId();
+        var empresaId = options.Value.DefaultEmpresaId;
+        var moneda = options.Value.DefaultMoneda; // MUST: MXN by default (DEC-009)
 
-        logger.LogDebug("Getting cartera resumen for org {OrgId}", orgId);
+        logger.LogDebug("Getting cartera resumen for org {OrgId}, empresa {EmpresaId}, moneda {Moneda}",
+            orgId, empresaId, moneda);
 
-        var clientes = await db.Clientes
-            .Where(c => c.OrganizationId == orgId)
-            .ToListAsync(ct);
+        // Try cache first
+        var cacheKey = CacheKeys.CarteraResumen(orgId, empresaId, moneda == 1 ? "MXN" : "USD");
 
-        var totalCartera = clientes.Sum(c => c.SaldoTotal);
-        var carteraVencida = clientes.Sum(c => c.SaldoVencido);
-        var carteraVigente = totalCartera - carteraVencida;
+        var response = await cache.GetOrSetAsync(
+            cacheKey,
+            async () =>
+            {
+                logger.LogInformation("Cache miss - fetching from connector: {CacheKey}", cacheKey);
 
-        var ultimaSync = await db.Connectors
-            .Where(c => c.OrganizationId == orgId)
-            .Select(c => c.LastSyncAt)
-            .MaxAsync(ct);
+                var agentResponse = await agentClient.GetCarteraResumenAsync(empresaId, moneda, ct);
 
-        var response = new CarteraResumenResponse(
-            TotalCartera: totalCartera,
-            CarteraVigente: carteraVigente,
-            CarteraVencida: carteraVencida,
-            PorcentajeVencido: totalCartera > 0 ? (carteraVencida / totalCartera) * 100 : 0,
-            ClientesConSaldo: clientes.Count(c => c.SaldoTotal > 0),
-            FacturasActivas: clientes.Sum(c => c.FacturasActivas),
-            UltimaSincronizacion: ultimaSync
+                if (agentResponse?.Success != true || agentResponse.Data == null)
+                {
+                    logger.LogWarning("Failed to fetch cartera resumen from connector");
+                    return null;
+                }
+
+                var data = agentResponse.Data;
+                return new CarteraResumenResponse(
+                    TotalCartera: data.TotalCartera,
+                    CarteraVigente: data.CarteraPorVencer,
+                    CarteraVencida: data.CarteraVencida,
+                    PorcentajeVencido: data.TotalCartera > 0
+                        ? Math.Round((data.CarteraVencida / data.TotalCartera) * 100, 2)
+                        : 0,
+                    ClientesConSaldo: data.ClientesConSaldo,
+                    FacturasActivas: data.TotalFacturas,
+                    UltimaSincronizacion: DateTime.UtcNow
+                );
+            },
+            CacheKeys.DefaultExpiration,
+            ct
         );
+
+        if (response == null)
+        {
+            return Results.Problem(
+                title: "Connector unavailable",
+                detail: "Unable to fetch data from ASPEL connector. Please try again later.",
+                statusCode: 503
+            );
+        }
 
         return Results.Ok(response);
     }
 
     private static async Task<IResult> GetAntiguedad(
         ClaimsPrincipal principal,
-        AppDbContext db,
+        ICobranzaAgentClient agentClient,
+        ICacheService cache,
+        IOptions<CobranzaAgentOptions> options,
         ILogger<Program> logger,
         CancellationToken ct)
     {
         var orgId = principal.GetOrganizationId();
+        var empresaId = options.Value.DefaultEmpresaId;
+        var moneda = options.Value.DefaultMoneda; // MUST: MXN by default (DEC-009)
 
-        logger.LogDebug("Getting cartera antiguedad for org {OrgId}", orgId);
+        logger.LogDebug("Getting cartera antiguedad for org {OrgId}, empresa {EmpresaId}", orgId, empresaId);
 
-        var facturas = await db.Facturas
-            .Where(f => f.Cliente.OrganizationId == orgId)
-            .Where(f => f.Status != FacturaStatus.Pagada && f.Status != FacturaStatus.Cancelada)
-            .ToListAsync(ct);
+        // Try cache first
+        var cacheKey = CacheKeys.CarteraAntiguedad(orgId, empresaId, moneda == 1 ? "MXN" : "USD");
 
-        var total = facturas.Sum(f => f.Saldo);
+        var response = await cache.GetOrSetAsync(
+            cacheKey,
+            async () =>
+            {
+                logger.LogInformation("Cache miss - fetching antiguedad from connector: {CacheKey}", cacheKey);
 
-        var rangos = facturas
-            .GroupBy(f => f.RangoAntiguedad)
-            .Select(g => new RangoAntiguedadItem(
-                Rango: g.Key.ToString(),
-                Label: GetRangoLabel(g.Key),
-                Monto: g.Sum(f => f.Saldo),
-                Facturas: g.Count(),
-                Porcentaje: total > 0 ? Math.Round((g.Sum(f => f.Saldo) / total) * 100, 2) : 0
-            ))
-            .OrderBy(r => GetRangoOrder(r.Rango))
-            .ToList();
+                var agentResponse = await agentClient.GetCarteraAntiguedadAsync(empresaId, moneda, ct);
 
-        // Ensure all ranges are present even if empty
-        var allRanges = EnsureAllRanges(rangos, total);
+                if (agentResponse?.Success != true || agentResponse.Data == null)
+                {
+                    logger.LogWarning("Failed to fetch cartera antiguedad from connector");
+                    return null;
+                }
 
-        var response = new CarteraAntiguedadResponse(allRanges, total);
+                var data = agentResponse.Data;
+
+                // Map connector ranges to our format
+                var rangos = new List<RangoAntiguedadItem>
+                {
+                    new("Vigente", "Vigente", data.Corriente, 0,
+                        data.Total > 0 ? Math.Round((data.Corriente / data.Total) * 100, 2) : 0),
+                    new("Dias1a30", "1-30 días", data.Rango1a30, 0,
+                        data.Total > 0 ? Math.Round((data.Rango1a30 / data.Total) * 100, 2) : 0),
+                    new("Dias31a60", "31-60 días", data.Rango31a60, 0,
+                        data.Total > 0 ? Math.Round((data.Rango31a60 / data.Total) * 100, 2) : 0),
+                    new("Dias61a90", "61-90 días", data.Rango61a90, 0,
+                        data.Total > 0 ? Math.Round((data.Rango61a90 / data.Total) * 100, 2) : 0),
+                    new("MasDe90", "Más de 90 días", data.RangoMas90, 0,
+                        data.Total > 0 ? Math.Round((data.RangoMas90 / data.Total) * 100, 2) : 0)
+                };
+
+                return new CarteraAntiguedadResponse(rangos, data.Total);
+            },
+            CacheKeys.DefaultExpiration,
+            ct
+        );
+
+        if (response == null)
+        {
+            return Results.Problem(
+                title: "Connector unavailable",
+                detail: "Unable to fetch aging data from ASPEL connector. Please try again later.",
+                statusCode: 503
+            );
+        }
 
         return Results.Ok(response);
     }
 
-    private static string GetRangoLabel(RangoAntiguedad rango) => rango switch
+    private static async Task<IResult> RefreshCache(
+        ClaimsPrincipal principal,
+        ICacheService cache,
+        IOptions<CobranzaAgentOptions> options,
+        ILogger<Program> logger,
+        CancellationToken ct)
     {
-        RangoAntiguedad.Vigente => "Vigente",
-        RangoAntiguedad.Dias1a30 => "1-30 días",
-        RangoAntiguedad.Dias31a60 => "31-60 días",
-        RangoAntiguedad.Dias61a90 => "61-90 días",
-        RangoAntiguedad.MasDe90 => "Más de 90 días",
-        _ => "Desconocido"
-    };
+        var orgId = principal.GetOrganizationId();
+        var empresaId = options.Value.DefaultEmpresaId;
 
-    private static int GetRangoOrder(string rango) => rango switch
-    {
-        "Vigente" => 0,
-        "Dias1a30" => 1,
-        "Dias31a60" => 2,
-        "Dias61a90" => 3,
-        "MasDe90" => 4,
-        _ => 99
-    };
+        logger.LogInformation("Refreshing cartera cache for org {OrgId}, empresa {EmpresaId}", orgId, empresaId);
 
-    private static List<RangoAntiguedadItem> EnsureAllRanges(List<RangoAntiguedadItem> rangos, decimal total)
-    {
-        var rangoNames = new[]
-        {
-            (Rango: "Vigente", Label: "Vigente"),
-            (Rango: "Dias1a30", Label: "1-30 días"),
-            (Rango: "Dias31a60", Label: "31-60 días"),
-            (Rango: "Dias61a90", Label: "61-90 días"),
-            (Rango: "MasDe90", Label: "Más de 90 días")
-        };
+        // Invalidate all cartera cache for this org/empresa
+        await cache.RemoveByPatternAsync(CacheKeys.EmpresaPattern(orgId, empresaId), ct);
 
-        var result = new List<RangoAntiguedadItem>();
-        foreach (var (rango, label) in rangoNames)
-        {
-            var existing = rangos.FirstOrDefault(r => r.Rango == rango);
-            if (existing != null)
-            {
-                result.Add(existing);
-            }
-            else
-            {
-                result.Add(new RangoAntiguedadItem(rango, label, 0, 0, 0));
-            }
-        }
-
-        return result;
+        return Results.NoContent();
     }
 }

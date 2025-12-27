@@ -4,8 +4,9 @@
  * Este archivo define los tipos que deben ser consistentes entre
  * el frontend (TypeScript) y el backend (.NET).
  *
- * @version 1.0
- * @date 2025-12-23
+ * @version 1.1
+ * @date 2025-12-26
+ * @changelog M3: Added CarteraResumenResponse, CarteraAntiguedadResponse, ClienteDetailResponse
  */
 
 // ============================================================
